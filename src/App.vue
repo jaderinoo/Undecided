@@ -184,11 +184,36 @@ export default {
 
 <style>
 .black-background {
-  background-color: #000000 !important;
+  background-color: #000000;
+  background-image: url('/background.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
   overflow-y: auto;
+}
+
+.black-background::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(
+      ellipse 150% 100% at center,
+      transparent 0%,
+      rgba(0, 0, 0, 0.6) 20%,
+      rgba(0, 0, 0, 0.8) 40%,
+      rgba(0, 0, 0, 0.95) 60%,
+      rgba(0, 0, 0, 1) 80%
+    );
+  pointer-events: none;
+  z-index: 1;
 }
 
 #snow {
