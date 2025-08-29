@@ -1,0 +1,22 @@
+{
+  "name": "undecided",
+  "version": "1.0.0",
+  "description": "Undecided - A Vue 3 web application with Docker support",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "serve": "vite preview --host 0.0.0.0 --port 3000"
+  },
+  "packageManager": "yarn@1.22.22",
+  "dependencies": {
+    "@mdi/font": "^7.4.47",
+    "pure-snow.js": "^2.1.0",
+    "vue": "^3.3.4",
+    "vuetify": "^3.9.6"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.2.3",
+    "vite": "^4.4.5"
+  }
+}
