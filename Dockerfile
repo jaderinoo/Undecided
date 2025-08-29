@@ -1,26 +1,32 @@
-# Use Node.js Alpine as base image for better compatibility
-FROM node:18-alpine
+# Stage 1: Build
+FROM node:18-alpine AS build
 
-# Set working directory
 WORKDIR /app
 
-# Copy package files
+# Copy package files and install all deps (dev + prod)
 COPY package*.json yarn.lock ./
+RUN yarn install --frozen-lockfile
 
-# Install dependencies using yarn
-RUN yarn install --frozen-lockfile --production
-
-# Copy source code
+# Copy source and build with vite
 COPY . .
-
-# Build the application
 RUN yarn build
 
-# Install serve globally
+# Stage 2: Runtime
+FROM node:18-alpine AS runtime
+
+WORKDIR /app
+
+# Copy only package files first and install prod deps
+COPY package*.json yarn.lock ./
+RUN yarn install --frozen-lockfile --production
+
+# Copy built dist from build stage
+COPY --from=build /app/dist ./dist
+
+# Install 'serve' to serve the static files
 RUN yarn global add serve
 
-# Expose port
 EXPOSE 3000
 
-# Start the application
-CMD ["yarn", "run", "serve"] 
+# Serve built app
+CMD ["serve", "-s", "dist", "-l", "3000"]
