@@ -1,18 +1,7 @@
 <template>
   <v-app>
-    <v-main class="black-background" @click="createPoof">
-      <div id="snow" data-count="200"></div>
-      
-      <!-- Poof effects -->
-      <div
-        v-for="poof in poofs"
-        :key="poof.id"
-        class="poof"
-        :style="{
-          left: poof.x + 'px',
-          top: poof.y + 'px'
-        }"
-      ></div>
+    <v-main class="black-background">
+      <div id="snow" :data-count="snowCount"></div>
       
       <div class="welcome-container">
         <h1 class="welcome-title">welcome home, friend</h1>
@@ -58,13 +47,15 @@
                       color="white"
                       class="mb-3"
                     ></v-icon>
-                    <div v-if="apps[1].vpnRequired" class="vpn-tag">VPN Required</div>
+                    <div v-if="apps[1].vpnRequired" class="vpn-tag">VPN</div>
                   </div>
                   <h3 class="app-title">{{ apps[1].name }}</h3>
                   <p class="app-description">{{ apps[1].description }}</p>
                 </v-card-text>
               </v-card>
             </div>
+            
+            <div class="row-divider"></div>
             
             <!-- Bottom row: Portainer, Pi-hole, Tabby, Glance -->
             <div class="bottom-row">
@@ -85,7 +76,7 @@
                       color="white"
                       class="mb-3"
                     ></v-icon>
-                    <div v-if="app.vpnRequired" class="vpn-tag">VPN Required</div>
+                    <div v-if="app.vpnRequired" class="vpn-tag">VPN</div>
                   </div>
                   <h3 class="app-title">{{ app.name }}</h3>
                   <p class="app-description">{{ app.description }}</p>
@@ -100,7 +91,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { createSnow, showSnow } from 'pure-snow.js'
 import 'pure-snow.js/style.css'
 
@@ -158,34 +149,18 @@ export default {
       }
     ])
 
-    const poofs = ref([])
-
-    const createPoof = (event) => {
-      // Only create poof if clicking on empty space, not on buttons or interactive elements
-      if (event.target.classList.contains('app-card') || 
-          event.target.closest('.app-card') || 
-          event.target.classList.contains('v-card') ||
-          event.target.closest('.v-card')) {
-        return; // Don't create poof on buttons
+    // Dynamic snow count based on screen size
+    const snowCount = computed(() => {
+      if (window.innerWidth <= 480) {
+        return 50  // Very small screens
+      } else if (window.innerWidth <= 768) {
+        return 100 // Small screens
+      } else if (window.innerWidth <= 1024) {
+        return 150 // Medium screens
+      } else {
+        return 200 // Large screens
       }
-      
-      const poof = {
-        id: Date.now(),
-        x: event.clientX,
-        y: event.clientY,
-        createdAt: Date.now()
-      }
-      
-      poofs.value.push(poof)
-      
-      // Remove poof after animation completes
-      setTimeout(() => {
-        const index = poofs.value.findIndex(p => p.id === poof.id)
-        if (index > -1) {
-          poofs.value.splice(index, 1)
-        }
-      }, 750)
-    }
+    })
 
     const navigateToApp = (url) => {
       // Open the URL in a new tab
@@ -201,8 +176,7 @@ export default {
     return {
       apps,
       navigateToApp,
-      poofs,
-      createPoof
+      snowCount
     }
   }
 }
@@ -211,9 +185,10 @@ export default {
 <style>
 .black-background {
   background-color: #000000 !important;
-  height: 100vh;
+  min-height: 100vh;
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 #snow {
@@ -231,47 +206,21 @@ export default {
   box-shadow: 0 0 100px rgba(255, 255, 255, 1);
 }
 
-/* Poof effect */
-.poof {
-  position: fixed;
-  width: 20px;
-  height: 20px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.4) 50%, rgba(255, 255, 255, 0.2) 100%);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 9999;
-  transform: translate(-50%, -50%);
-  animation: poofAnimation 0.75s ease forwards;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
-}
 
-
-
-@keyframes poofAnimation {
-  0% {
-    opacity: 0.6;
-    transform: translate(-50%, -50%) scale(0.1);
-  }
-  50% {
-    opacity: 0.4;
-    transform: translate(-50%, -50%) scale(1.2);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(1.5);
-  }
-}
 
 .welcome-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  height: 100vh;
+  min-height: 100vh;
   padding: 2rem;
   padding-top: 15vh;
+  padding-bottom: 4rem;
   position: relative;
   z-index: 2;
+  width: 100%;
+  text-align: center;
 }
 
 .welcome-title {
@@ -288,6 +237,8 @@ export default {
   opacity: 1;
   position: relative;
   z-index: 10;
+  width: 100%;
+  display: block;
 }
 
 .cards-container {
@@ -297,21 +248,22 @@ export default {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  padding-bottom: 2vh;
+  padding-bottom: 4vh;
+  margin-bottom: 2rem;
 }
 
 .cards-grid {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1rem;
 }
 
 .top-row {
   display: flex;
   justify-content: center;
   gap: 2rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 
 .bottom-row {
@@ -319,6 +271,7 @@ export default {
   justify-content: center;
   gap: 1rem;
   flex-wrap: wrap;
+  margin-top: 1rem;
 }
 
 .top-card {
@@ -329,6 +282,21 @@ export default {
 .bottom-card {
   flex: 0 0 auto;
   width: 250px;
+}
+
+.row-divider {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.1) 20%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0.1) 80%,
+    transparent 100%
+  );
+  margin: 1rem 0;
+  opacity: 0.6;
 }
 
 .app-card {
@@ -397,6 +365,9 @@ export default {
   padding: 2px 6px;
   z-index: 5;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 255, 255, 0.3);
+  text-underline-offset: 2px;
 }
 
 .app-title {
@@ -417,8 +388,9 @@ export default {
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .welcome-title {
-    font-size: 2.5rem;
-    margin-bottom: 3rem;
+    font-size: 2rem;
+    margin-bottom: 4rem;
+    white-space: nowrap;
   }
   
   .welcome-container {
@@ -426,26 +398,45 @@ export default {
   }
   
   .top-row {
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
   }
   
   .bottom-row {
     gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
   }
   
   .top-card,
   .bottom-card {
-    width: 100%;
-    max-width: 320px;
+    width: calc(50% - 0.5rem);
+    min-width: 200px;
+    max-width: 280px;
   }
 }
 
 @media (max-width: 480px) {
   .welcome-title {
-    font-size: 2rem;
-    margin-bottom: 2rem;
+    font-size: 1.8rem;
+    margin-bottom: 3rem;
+    padding-top: 6rem;
+    white-space: nowrap;
+  }
+  
+  .top-card,
+  .bottom-card {
+    width: calc(50% - 0.5rem);
+    min-width: 160px;
+    max-width: 220px;
+  }
+  
+  .top-row,
+  .bottom-row {
+    gap: 0.75rem;
   }
 }
 </style> 
