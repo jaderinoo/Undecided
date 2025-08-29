@@ -12,17 +12,17 @@ COPY . .
 RUN yarn build
 
 # Stage 2: Runtime
-FROM nginx:alpine AS runtime
+FROM node:18-alpine AS runtime
 
-WORKDIR /usr/share/nginx/html
+WORKDIR /app
 
 # Copy built dist from build stage
-COPY --from=build /app/dist .
+COPY --from=build /app/dist ./dist
 
-# Copy nginx config
-COPY nginx.conf /etc/nginx/nginx.conf
+# Install a simple HTTP server
+RUN npm install -g serve
 
-EXPOSE 80
+EXPOSE 3000
 
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Start the HTTP server
+CMD ["serve", "-s", "dist", "-l", "3000"]
