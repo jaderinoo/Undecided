@@ -1,19 +1,12 @@
 version: '3.8'
 
 services:
-  vue:
+  undecided:
     build:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"
-    volumes:
-      - .:/app:cached
-      - /app/node_modules
+      - "3000:80"
     environment:
-      - NODE_ENV=development
-      - CHOKIDAR_USEPOLLING=true
-      - CHOKIDAR_INTERVAL=1000
-      - WATCHPACK_POLLING=true
-      - VITE_WATCH_USE_POLLING=true
-    command: yarn run dev 
+      - NODE_ENV=production
+    restart: unless-stopped 

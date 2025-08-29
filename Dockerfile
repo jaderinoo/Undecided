@@ -12,21 +12,17 @@ COPY . .
 RUN yarn build
 
 # Stage 2: Runtime
-FROM node:18-alpine AS runtime
+FROM nginx:alpine AS runtime
 
-WORKDIR /app
-
-# Copy only package files first and install prod deps
-COPY package*.json yarn.lock ./
-RUN yarn install --frozen-lockfile --production
+WORKDIR /usr/share/nginx/html
 
 # Copy built dist from build stage
-COPY --from=build /app/dist ./dist
+COPY --from=build /app/dist .
 
-# Install 'serve' to serve the static files
-RUN yarn global add serve
+# Copy nginx config
+COPY nginx.conf /etc/nginx/nginx.conf
 
-EXPOSE 3000
+EXPOSE 80
 
-# Serve built app
-CMD ["serve", "-s", "dist", "-l", "3000"]
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]
