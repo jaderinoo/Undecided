@@ -120,7 +120,7 @@ export default {
         name: 'Portainer',
         description: 'Docker container management',
         icon: 'mdi-docker',
-        url: 'https://192.168.50.100:9443/#!/auth',
+        url: 'https://portainer.undecided.dev',
         vpnRequired: true
       },
       {
@@ -128,7 +128,7 @@ export default {
         name: 'Pi-hole',
         description: 'Network-wide ad blocking',
         icon: 'mdi-shield-off',
-        url: 'http://192.168.50.100:8080/admin/login',
+        url: 'https://pihole.undecided.dev/admin/login',
         vpnRequired: true
       },
       {
@@ -136,7 +136,7 @@ export default {
         name: 'Tabby',
         description: 'AI coding assistant',
         icon: 'mdi-robot',
-        url: 'http://192.168.50.100:5252',
+        url: 'https://tabby.undecided.dev',
         vpnRequired: true
       },
       {
@@ -144,7 +144,7 @@ export default {
         name: 'Glance',
         description: 'Quick overview dashboard',
         icon: 'mdi-eye',
-        url: 'http://192.168.50.100:61208',
+        url: 'https://glance.undecided.dev',
         vpnRequired: true
       }
     ])
